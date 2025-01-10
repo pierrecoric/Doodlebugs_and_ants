@@ -32,7 +32,7 @@ const int BREED_DOODLEBUG(8), STARVE_DOODLEBUG(3), BREED_ANTS(3);
 
 //The engine of the simulation.
 class Simulation {
-    //Friends classes of the simulation
+    //Friends classes of the simulation.
     friend class Organism;
     friend class Doodlebug;
     friend class Ant;
@@ -49,6 +49,7 @@ class Simulation {
     public:
         //Constructor
         Simulation();
+        //Destructor
         ~Simulation();
         //The three functions that run the simulation.
         void setup();
@@ -146,6 +147,7 @@ void Simulation::display() {
     //Clear terminal.
     cout << "\033[2J\033[H";
     cout.flush();
+    cout << "world at time " << frameCount << ":" << endl << endl;
     //Iterate over the world and display the right symbol according to the critter present at each position.
     for(int y = 0; y < WORLD_SIZE_Y; y++) {
         for (int x = 0; x < WORLD_SIZE_X; x++) {
@@ -153,30 +155,31 @@ void Simulation::display() {
                 cout << '-';
             }
             else if (world[x][y] -> returnType() == ANT) {
-                cout << 'x';
+                cout << ANT;
             }
             else {
-                cout << 'O';    
+                cout << DOODLEBUG;    
             } 
         }
         cout << endl;
     }
+    cout << endl << "press ENTER to continue";
 }
 
 //Function to take a time step forward.
 void Simulation::forward() {
-    //Reset the didMove flag for everybody
+    //Reset the didMove flag for everybody.
     for(int i = 0; i < doodlebugList.size(); i++) {
         doodlebugList[i]->setDidMove();
     }
     for(int i = 0; i < antList.size(); i++) {
         antList[i]->setDidMove();
     }
-    //The doodlebugs chase their preys
+    //The doodlebugs chase their preys.
     for(int i = 0; i < doodlebugList.size(); i++) {
         doodlebugList[i]->chase();
     }
-    //Anyone who did not move yet moves
+    //Anyone who did not move yet moves.
     for(int i = 0; i < doodlebugList.size(); i++) {
         doodlebugList[i]->breed(BREED_DOODLEBUG);
         doodlebugList[i]->move();
@@ -184,7 +187,8 @@ void Simulation::forward() {
     for(int i = 0; i < antList.size(); i++) {
         antList[i]->breed(BREED_ANTS);
         antList[i]->move();
-    } 
+    }
+    frameCount ++;
 }
 
 //Destructor for the simulation at the end of the program.
@@ -257,11 +261,11 @@ void Organism::move() {
 }
 
 void Organism::breed(int breedTime) {
-    //When it is time to make a baby
+    //When it is time to make a baby.
     if (breedCount >= breedTime) {
         vector<int> moves = validMoves(x, y);
 
-        //If there is space to make a baby
+        //If there is space to make a baby.
         if (moves.size() > 0) {
             //Pick a direction from the vector of possible directions.
             int direction = moves[generateRandom(0, moves.size() - 1)];
@@ -291,7 +295,7 @@ void Organism::breed(int breedTime) {
                 currentSimulation->world[newX][newY] = baby;
                 currentSimulation->antList.push_back(baby);
             }
-            //Reset the breedCount
+            //Reset the breedCount.
             breedCount = 0;
         }
     } 
@@ -410,7 +414,7 @@ void Doodlebug::chase() {
                 break;
             }
         }
-        //Free the memory
+        //Free the memory for the starved bug.
         delete this;
     }
 }
